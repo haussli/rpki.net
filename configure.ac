@@ -88,9 +88,10 @@ fi
 unset old_LDFLAGS
 
 AC_PROG_GREP
+# locate and test python3
 AC_ARG_WITH(python,
         AS_HELP_STRING([--with-python=<python name>],
-                       [specify name or fqpn of python interpreter]),
+                       [specify name or fqpn of python3 interpreter]),
 [ case "$withval" in
   yes)
         AC_MSG_RESULT(yes)
@@ -108,7 +109,21 @@ AC_ARG_WITH(python,
     PYTHONNAME="python"
     AC_MSG_RESULT($withval)
 ])
-AC_PATH_PROG([PYTHON], [$PYTHONNAME])
+AC_PATH_PROG([PYTHON], [$PYTHONNAME], [no])
+if test $PYTHON = no; then
+    AC_MSG_ERROR([Cannot find a Python interpreter, python >=3.6 required.])
+    exit 1
+fi
+$PYTHON << EOF
+import sys
+if not sys.version_info[[0]] == 3 or not sys.version_info[[1]] >= 6:
+ sys.exit(1)
+
+EOF
+if test $? -ne 0 ; then
+    AC_MSG_ERROR([can't locate a suitable python3; must >=3.6.])
+    exit 1
+fi
 
 AC_PATH_PROG([XSLTPROC], [xsltproc])
 AC_PATH_PROG([AWK], [awk])
@@ -432,16 +447,6 @@ AC_SUBST(CFG_INSTALL_TARGETS)
 # we don't have Python at all, none of the rest of this matters.  If
 # we do have Python, we need to check for required packages and
 # versions.
-
-if test "x$PYTHON" = "x"
-then
-	AC_MSG_ERROR([I can't find a Python binary at all, this isn't going to work.  Perhaps you need to set PATH?])
-fi
-
-AC_MSG_CHECKING([for Python version 2.7 or higher])
-have_acceptable_python=`$PYTHON -c 'import sys; print "yes" if sys.version_info[[0]] == 2 and sys.version_info[[1]] >= 7 else "no"'`
-AC_MSG_RESULT([$have_acceptable_python])
-
 AC_MSG_CHECKING([distutils to find out where Python.h should be])
 python_h=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_inc() + "/Python.h"'`
 AC_MSG_RESULT([$python_h])
@@ -499,12 +504,6 @@ AC_MSG_RESULT([$have_argparse])
 
 build_ok=yes
 runtime_ok=yes
-
-if test $have_acceptable_python = no
-then
-	runtime_ok=no
-	AC_MSG_WARN([The RPKI code requires Python version 2.x, for x = 7 or higher.])
-fi
 
 if test $build_rp_tools = yes
 then

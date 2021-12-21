@@ -1376,7 +1376,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-system-openssl   Link against system copy of OpenSSL
   --with-python=<python name>
-                          specify name or fqpn of python interpreter
+                          specify name or fqpn of python3 interpreter
 
 Some influential environment variables:
   RCYNIC_DIR  Where to put output files from rcynic and rpki-rtr
@@ -3931,6 +3931,7 @@ $as_echo "$ac_cv_path_GREP" >&6; }
  GREP="$ac_cv_path_GREP"
 
 
+# locate and test python3
 
 # Check whether --with-python was given.
 if test "${with_python+set}" = set; then :
@@ -3987,6 +3988,7 @@ done
   done
 IFS=$as_save_IFS
 
+  test -z "$ac_cv_path_PYTHON" && ac_cv_path_PYTHON="no"
   ;;
 esac
 fi
@@ -4000,6 +4002,20 @@ $as_echo "no" >&6; }
 fi
 
 
+if test $PYTHON = no; then
+    as_fn_error $? "Cannot find a Python interpreter, python >=3.6 required." "$LINENO" 5
+    exit 1
+fi
+$PYTHON << EOF
+import sys
+if not sys.version_info[0] == 3 or not sys.version_info[1] >= 6:
+ sys.exit(1)
+
+EOF
+if test $? -ne 0 ; then
+    as_fn_error $? "can't locate a suitable python3; must >=3.6." "$LINENO" 5
+    exit 1
+fi
 
 # Extract the first word of "xsltproc", so it can be a program name with args.
 set dummy xsltproc; ac_word=$2
@@ -4693,18 +4709,6 @@ fi
 # we don't have Python at all, none of the rest of this matters.  If
 # we do have Python, we need to check for required packages and
 # versions.
-
-if test "x$PYTHON" = "x"
-then
-	as_fn_error $? "I can't find a Python binary at all, this isn't going to work.  Perhaps you need to set PATH?" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Python version 2.7 or higher" >&5
-$as_echo_n "checking for Python version 2.7 or higher... " >&6; }
-have_acceptable_python=`$PYTHON -c 'import sys; print "yes" if sys.version_info[0] == 2 and sys.version_info[1] >= 7 else "no"'`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_acceptable_python" >&5
-$as_echo "$have_acceptable_python" >&6; }
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking distutils to find out where Python.h should be" >&5
 $as_echo_n "checking distutils to find out where Python.h should be... " >&6; }
 python_h=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_inc() + "/Python.h"'`
@@ -4788,13 +4792,6 @@ $as_echo "$have_argparse" >&6; }
 
 build_ok=yes
 runtime_ok=yes
-
-if test $have_acceptable_python = no
-then
-	runtime_ok=no
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The RPKI code requires Python version 2.x, for x = 7 or higher." >&5
-$as_echo "$as_me: WARNING: The RPKI code requires Python version 2.x, for x = 7 or higher." >&2;}
-fi
 
 if test $build_rp_tools = yes
 then
