@@ -88,7 +88,28 @@ fi
 unset old_LDFLAGS
 
 AC_PROG_GREP
-AC_PATH_PROG([PYTHON], [python])
+AC_ARG_WITH(python,
+        AS_HELP_STRING([--with-python=<python name>],
+                       [specify name or fqpn of python interpreter]),
+[ case "$withval" in
+  yes)
+        AC_MSG_RESULT(yes)
+        PYTHONNAME="python"
+        ;;
+  no)
+        AC_MSG_RESULT(no)
+        PYTHONNAME="python"
+        ;;
+  *)
+        AC_MSG_RESULT($withval)
+        PYTHONNAME="$withval"
+  esac
+], [AC_MSG_RESULT(no)
+    PYTHONNAME="python"
+    AC_MSG_RESULT($withval)
+])
+AC_PATH_PROG([PYTHON], [$PYTHONNAME])
+
 AC_PATH_PROG([XSLTPROC], [xsltproc])
 AC_PATH_PROG([AWK], [awk])
 AC_PATH_PROG([SORT], [sort])

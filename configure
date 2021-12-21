@@ -727,6 +727,7 @@ enable_python
 enable_django
 enable_rpki_rtr
 enable_rcynic_jail
+with_python
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1374,6 +1375,8 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-system-openssl   Link against system copy of OpenSSL
+  --with-python=<python name>
+                          specify name or fqpn of python interpreter
 
 Some influential environment variables:
   RCYNIC_DIR  Where to put output files from rcynic and rpki-rtr
@@ -3928,8 +3931,37 @@ $as_echo "$ac_cv_path_GREP" >&6; }
  GREP="$ac_cv_path_GREP"
 
 
-# Extract the first word of "python", so it can be a program name with args.
-set dummy python; ac_word=$2
+
+# Check whether --with-python was given.
+if test "${with_python+set}" = set; then :
+  withval=$with_python;  case "$withval" in
+  yes)
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+        PYTHONNAME="python"
+        ;;
+  no)
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        PYTHONNAME="python"
+        ;;
+  *)
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+$as_echo "$withval" >&6; }
+        PYTHONNAME="$withval"
+  esac
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+    PYTHONNAME="python"
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $withval" >&5
+$as_echo "$withval" >&6; }
+
+fi
+
+# Extract the first word of "$PYTHONNAME", so it can be a program name with args.
+set dummy $PYTHONNAME; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
 if ${ac_cv_path_PYTHON+:} false; then :
@@ -3966,6 +3998,7 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
+
 
 
 # Extract the first word of "xsltproc", so it can be a program name with args.
