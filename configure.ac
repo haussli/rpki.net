@@ -474,7 +474,7 @@ AC_MSG_RESULT([$have_tornado])
 if test $have_tornado = yes
 then
 	AC_MSG_CHECKING([for Tornado 4.2 or higher])
-	have_acceptable_tornado=`$PYTHON -c "import tornado; print('no') if tornado.version_info < (4, 2) else 'yes'"`
+	have_acceptable_tornado=`$PYTHON -c "import tornado; print('no') if tornado.version_info < (4, 2) else print('yes')"`
 	AC_MSG_RESULT([$have_acceptable_tornado])
 else
 	have_acceptable_tornado=no
@@ -487,7 +487,7 @@ AC_MSG_RESULT([$have_django])
 if test $have_django = yes
 then
 	AC_MSG_CHECKING([for Django 1.8 or higher])
-	have_acceptable_django=`$PYTHON -c "import django; print('no') if django.VERSION < (1, 8) else 'yes'"`
+	have_acceptable_django=`$PYTHON -c "import django; print('no') if django.VERSION < (1, 8) else print('yes')"`
 	AC_MSG_RESULT([$have_acceptable_django])
 else
 	have_acceptable_django=no
@@ -540,7 +540,7 @@ then
 	AC_MSG_WARN([The RPKI tools require the Python LXML package.])
 fi
 
-if test $have_acceptable_django = no
+if test "$have_acceptable_django" = no
 then
 	runtime_ok=no
 	AC_MSG_WARN([The RPKI tools require Django 1.8 or higher.])
@@ -552,7 +552,7 @@ then
 	AC_MSG_WARN([The RPKI tools require the Python argparse module.])
 fi
 
-if test $have_acceptable_tornado = no
+if test "$have_acceptable_tornado" = no
 then
 	runtime_ok=no
 	AC_MSG_WARN([The RPKI tools require Tornado 4.2 or higher.])

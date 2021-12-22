@@ -4760,7 +4760,7 @@ if test $have_tornado = yes
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tornado 4.2 or higher" >&5
 $as_echo_n "checking for Tornado 4.2 or higher... " >&6; }
-	have_acceptable_tornado=`$PYTHON -c "import tornado; print('no') if tornado.version_info < (4, 2) else 'yes'"`
+	have_acceptable_tornado=`$PYTHON -c "import tornado; print('no') if tornado.version_info < (4, 2) else print('yes')"`
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_acceptable_tornado" >&5
 $as_echo "$have_acceptable_tornado" >&6; }
 else
@@ -4777,7 +4777,7 @@ if test $have_django = yes
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Django 1.8 or higher" >&5
 $as_echo_n "checking for Django 1.8 or higher... " >&6; }
-	have_acceptable_django=`$PYTHON -c "import django; print('no') if django.VERSION < (1, 8) else 'yes'"`
+	have_acceptable_django=`$PYTHON -c "import django; print('no') if django.VERSION < (1, 8) else print('yes')"`
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_acceptable_django" >&5
 $as_echo "$have_acceptable_django" >&6; }
 else
@@ -4841,7 +4841,7 @@ then
 $as_echo "$as_me: WARNING: The RPKI tools require the Python LXML package." >&2;}
 fi
 
-if test $have_acceptable_django = no
+if test "$have_acceptable_django" = no
 then
 	runtime_ok=no
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The RPKI tools require Django 1.8 or higher." >&5
@@ -4855,7 +4855,7 @@ then
 $as_echo "$as_me: WARNING: The RPKI tools require the Python argparse module." >&2;}
 fi
 
-if test $have_acceptable_tornado = no
+if test "$have_acceptable_tornado" = no
 then
 	runtime_ok=no
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The RPKI tools require Tornado 4.2 or higher." >&5
