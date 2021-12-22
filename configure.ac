@@ -114,7 +114,7 @@ if test $PYTHON = no; then
     AC_MSG_ERROR([Cannot find a Python interpreter, python >=3.6 required.])
     exit 1
 fi
-$PYTHON << EOF
+$PYTHON - << EOF
 import sys
 if not sys.version_info[[0]] == 3 or not sys.version_info[[1]] >= 6:
  sys.exit(1)
@@ -448,10 +448,20 @@ AC_SUBST(CFG_INSTALL_TARGETS)
 # we do have Python, we need to check for required packages and
 # versions.
 AC_MSG_CHECKING([distutils to find out where Python.h should be])
-python_h=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_inc() + "/Python.h"'`
+python_h=`$PYTHON -c 'import distutils.sysconfig; print (distutils.sysconfig.get_python_inc() + "/Python.h")'`
 AC_MSG_RESULT([$python_h])
-
-AC_CHECK_HEADER([$python_h], [have_python_h=yes], [have_python_h=no])
+AC_CHECK_HEADER([`basename $python_h`], [have_python_h=yes], [
+	echo [Checking for Python.h with altered CFLAGS]
+	OCFLAGS=$CFLAGS
+	CFLAGS="-I`dirname $python_h` $CFLAGS"
+	$as_unset ac_cv_header_Python_h
+	AC_CHECK_HEADER([`basename $python_h`], [have_python_h=yes
+		AC_MSG_RESULT([yes])
+		python_h="`basename $python_h`"
+	], [
+		AC_MSG_ERROR([Cannot locate Python.h with CFLAGS $CFLAGS])
+	])
+])
 
 AC_MSG_CHECKING([for lxml.etree])
 if $PYTHON -c 'import lxml.etree' 2>/dev/null; then have_lxml=yes; else have_lxml=no; fi
@@ -464,7 +474,7 @@ AC_MSG_RESULT([$have_tornado])
 if test $have_tornado = yes
 then
 	AC_MSG_CHECKING([for Tornado 4.2 or higher])
-	have_acceptable_tornado=`$PYTHON -c "import tornado; print 'no' if tornado.version_info < (4, 2) else 'yes'"`
+	have_acceptable_tornado=`$PYTHON -c "import tornado; print('no') if tornado.version_info < (4, 2) else 'yes'"`
 	AC_MSG_RESULT([$have_acceptable_tornado])
 else
 	have_acceptable_tornado=no
@@ -477,7 +487,7 @@ AC_MSG_RESULT([$have_django])
 if test $have_django = yes
 then
 	AC_MSG_CHECKING([for Django 1.8 or higher])
-	have_acceptable_django=`$PYTHON -c "import django; print 'no' if django.VERSION < (1, 8) else 'yes'"`
+	have_acceptable_django=`$PYTHON -c "import django; print('no') if django.VERSION < (1, 8) else 'yes'"`
 	AC_MSG_RESULT([$have_acceptable_django])
 else
 	have_acceptable_django=no

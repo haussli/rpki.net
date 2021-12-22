@@ -4006,7 +4006,7 @@ if test $PYTHON = no; then
     as_fn_error $? "Cannot find a Python interpreter, python >=3.6 required." "$LINENO" 5
     exit 1
 fi
-$PYTHON << EOF
+$PYTHON - << EOF
 import sys
 if not sys.version_info[0] == 3 or not sys.version_info[1] >= 6:
  sys.exit(1)
@@ -4711,16 +4711,35 @@ fi
 # versions.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking distutils to find out where Python.h should be" >&5
 $as_echo_n "checking distutils to find out where Python.h should be... " >&6; }
-python_h=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_inc() + "/Python.h"'`
+python_h=`$PYTHON -c 'import distutils.sysconfig; print (distutils.sysconfig.get_python_inc() + "/Python.h")'`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $python_h" >&5
 $as_echo "$python_h" >&6; }
-
-as_ac_Header=`$as_echo "ac_cv_header_$python_h" | $as_tr_sh`
-ac_fn_c_check_header_mongrel "$LINENO" "$python_h" "$as_ac_Header" "$ac_includes_default"
+as_ac_Header=`$as_echo "ac_cv_header_\`basename $python_h\`" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "`basename $python_h`" "$as_ac_Header" "$ac_includes_default"
 if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   have_python_h=yes
 else
-  have_python_h=no
+
+	echo Checking for Python.h with altered CFLAGS
+	OCFLAGS=$CFLAGS
+	CFLAGS="-I`dirname $python_h` $CFLAGS"
+	$as_unset ac_cv_header_Python_h
+	as_ac_Header=`$as_echo "ac_cv_header_\`basename $python_h\`" | $as_tr_sh`
+ac_fn_c_check_header_mongrel "$LINENO" "`basename $python_h`" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  have_python_h=yes
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		python_h="`basename $python_h`"
+
+else
+
+		as_fn_error $? "Cannot locate Python.h with CFLAGS $CFLAGS" "$LINENO" 5
+
+fi
+
+
+
 fi
 
 
@@ -4741,7 +4760,7 @@ if test $have_tornado = yes
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tornado 4.2 or higher" >&5
 $as_echo_n "checking for Tornado 4.2 or higher... " >&6; }
-	have_acceptable_tornado=`$PYTHON -c "import tornado; print 'no' if tornado.version_info < (4, 2) else 'yes'"`
+	have_acceptable_tornado=`$PYTHON -c "import tornado; print('no') if tornado.version_info < (4, 2) else 'yes'"`
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_acceptable_tornado" >&5
 $as_echo "$have_acceptable_tornado" >&6; }
 else
@@ -4758,7 +4777,7 @@ if test $have_django = yes
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Django 1.8 or higher" >&5
 $as_echo_n "checking for Django 1.8 or higher... " >&6; }
-	have_acceptable_django=`$PYTHON -c "import django; print 'no' if django.VERSION < (1, 8) else 'yes'"`
+	have_acceptable_django=`$PYTHON -c "import django; print('no') if django.VERSION < (1, 8) else 'yes'"`
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_acceptable_django" >&5
 $as_echo "$have_acceptable_django" >&6; }
 else
