@@ -88,7 +88,7 @@ class install_scripts(_install_scripts):
                         self.outfiles.append(out)
         if os.name == "posix":
             for fn in self.get_outputs():
-                mode = S_IMODE(os.stat(fn).st_mode) | 0555
+                mode = S_IMODE(os.stat(fn).st_mode) | 0o555
                 log.info("changing mode of %s to %o", fn, mode)
                 if not self.dry_run:
                     os.chmod(fn, mode)
